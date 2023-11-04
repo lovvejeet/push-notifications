@@ -38,7 +38,18 @@
   appId: "1:312567287991:web:a5214c1f867d9ebe893d32",
   measurementId: "G-L088G77Z82"
       };
-
+        messaging.getToken({ vapidKey: "BHK-uOSICd_jZZlbYztfHsC9iutMdslRIGqrjPH97SO-o6aPsTIJKwkhvVtKvQnOA72DPVaO5n--_PnZbR63np8" })
+        .then((currentToken) => {
+            if (currentToken) {
+                console.log("Current token:", currentToken);
+                // Display or save the current token as needed.
+            } else {
+                console.log("No registration token available.");
+            }
+        })
+        .catch((err) => {
+            console.log("An error occurred while getting the token:", err);
+        });
       const app = initializeApp(firebaseConfig);
       const messaging = getMessaging(app);
 
