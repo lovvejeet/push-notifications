@@ -1,90 +1,80 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <title>Firebase Messaging Demo</title>
     <style>
-      div {
-        margin-bottom: 15px;
-      }
+        div {
+            margin-bottom: 15px;
+        }
     </style>
-  </head>
-  <body>
+</head>
+<body>
     <div id="token"></div>
     <div id="msg"></div>
-    <div id="notis"></div>
+    <div id "notis"></div>
     <div id="err"></div>
     <!-- The core Firebase JS SDK is always required and must be listed first -->
     <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
-      import {
-        getMessaging,
-        getToken,
-        onMessage,
-      } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-messaging.js";
-      let MsgElem, TokenElem, NotisElem, ErrElem;
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+        import {
+            getMessaging,
+            getToken,
+            onMessage,
+        } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-messaging.js";
 
-      MsgElem = document.getElementById("msg");
-      TokenElem = document.getElementById("token");
-      NotisElem = document.getElementById("notis");
-      ErrElem = document.getElementById("err");
+        let MsgElem, TokenElem, NotisElem, ErrElem;
 
-      // TODO: Replace with your Firebase project's configuration
-      var firebaseConfig = {
-         apiKey: "AIzaSyC6uWRjltq0o5snuvCdwtxB5UIo5aFHJZo",
+        MsgElem = document.getElementById("msg");
+        TokenElem = document.getElementById("token");
+        NotisElem = document.getElementById("notis");
+        ErrElem = document.getElementById("err");
+
+        // TODO: Replace with your Firebase project's configuration
+        var firebaseConfig = {
+             apiKey: "AIzaSyC6uWRjltq0o5snuvCdwtxB5UIo5aFHJZo",
   authDomain: "notification-9950b.firebaseapp.com",
   projectId: "notification-9950b",
   storageBucket: "notification-9950b.appspot.com",
   messagingSenderId: "312567287991",
   appId: "1:312567287991:web:a5214c1f867d9ebe893d32",
   measurementId: "G-L088G77Z82"
-      };
-        messaging.getToken({ vapidKey: "BHK-uOSICd_jZZlbYztfHsC9iutMdslRIGqrjPH97SO-o6aPsTIJKwkhvVtKvQnOA72DPVaO5n--_PnZbR63np8" })
-        .then((currentToken) => {
-            if (currentToken) {
-                console.log("Current token:", currentToken);
-                // Display or save the current token as needed.
-            } else {
-                console.log("No registration token available.");
-            }
-        })
-        .catch((err) => {
-            console.log("An error occurred while getting the token:", err);
-        });
-      const app = initializeApp(firebaseConfig);
-      const messaging = getMessaging(app);
+        };
 
-      if (Notification.permission === "default") {
-        Notification.requestPermission()
-          .then(function (permission) {
-            if (permission === "granted") {
-              // Permission granted, you can now proceed to obtain the device token
-              return getToken(messaging);
-            }
-          })
-          .then(function (token) {
-            TokenElem.innerHTML = "Device token is: " + token;
-          })
-          .catch(function (err) {
-            ErrElem.innerHTML = "Unable to get permission to notify: " + err;
-          });
-      }
+        const app = initializeApp(firebaseConfig);
+        const messaging = getMessaging(app);
 
-      let enableForegroundNotification = true;
-      onMessage(messaging, function (payload) {
-        console.log("Message received:", payload);
-        NotisElem.innerHTML = JSON.stringify(payload);
-
-        if (enableForegroundNotification) {
-          let notification = payload.notification;
-          if ("serviceWorker" in navigator) {
-            navigator.serviceWorker
-              .getRegistration()
-              .then(function (registration) {
-                registration.showNotification(notification.title);
-              });
-          }
+        if (Notification.permission === "default") {
+            Notification.requestPermission()
+                .then(function (permission) {
+                    if (permission === "granted") {
+                        // Permission granted, you can now proceed to obtain the device token
+                        return getToken(messaging, { vapidKey: "BHK-uOSICd_jZZlbYztfHsC9iutMdslRIGqrjPH97SO-o6aPsTIJKwkhvVtKvQnOA72DPVaO5n--_PnZbR63np8" });
+                    }
+                })
+                .then(function (token) {
+                    TokenElem.innerHTML = "Device token is: " + token;
+                })
+                .catch(function (err) {
+                    ErrElem.innerHTML = "Unable to get permission to notify: " + err;
+                });
         }
-      });
+
+        let enableForegroundNotification = true;
+        onMessage(messaging, function (payload) {
+            console.log("Message received:", payload);
+            NotisElem.innerHTML = JSON.stringify(payload);
+
+            if (enableForegroundNotification) {
+                let notification = payload.notification;
+                if ("serviceWorker" in navigator) {
+                    navigator.serviceWorker
+                        .getRegistration()
+                        .then(function (registration) {
+                            registration.showNotification(notification.title);
+                        });
+                }
+            }
+        });
     </script>
-  </body>
+</body>
 </html>
