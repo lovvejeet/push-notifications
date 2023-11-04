@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Firebase Messaging Demo</title>
+    <style>
+      div {
+        margin-bottom: 15px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="token"></div>
+    <div id="msg"></div>
+    <div id="notis"></div>
+    <div id="err"></div>
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+      import {
+        getMessaging,
+        getToken,
+        onMessage,
+      } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-messaging.js";
+      let MsgElem, TokenElem, NotisElem, ErrElem;
+
+      MsgElem = document.getElementById("msg");
+      TokenElem = document.getElementById("token");
+      NotisElem = document.getElementById("notis");
+      ErrElem = document.getElementById("err");
+
+      // TODO: Replace with your Firebase project's configuration
+      var firebaseConfig = {
+        apiKey: "YOUR_API_KEY",
+        authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+        projectId: "YOUR_PROJECT_ID",
+        storageBucket: "YOUR_PROJECT_ID.appspot.com",
+        messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+        appId: "YOUR_APP_ID",
+        measurementId: "YOUR_MEASUREMENT_ID",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const messaging = getMessaging(app);
+
+      if (Notification.permission === "default") {
+        Notification.requestPermission()
+          .then(function (permission) {
+            if (permission === "granted") {
+              // Permission granted, you can now proceed to obtain the device token
+              return getToken(messaging);
+            }
+          })
+          .then(function (token) {
+            TokenElem.innerHTML = "Device token is: " + token;
+          })
+          .catch(function (err) {
+            ErrElem.innerHTML = "Unable to get permission to notify: " + err;
+          });
+      }
+
+      let enableForegroundNotification = true;
+      onMessage(messaging, function (payload) {
+        console.log("Message received:", payload);
+        NotisElem.innerHTML = JSON.stringify(payload);
+
+        if (enableForegroundNotification) {
+          let notification = payload.notification;
+          if ("serviceWorker" in navigator) {
+            navigator.serviceWorker
+              .getRegistration()
+              .then(function (registration) {
+                registration.showNotification(notification.title);
+              });
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
